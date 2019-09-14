@@ -73,20 +73,20 @@ function init() {
 function initSearch() {
 
     // specify default search algorithm to use for planning
-    //search_alg = "depth-first";  
-    //search_alg = "breadth-first";  
-    //search_alg = "greedy-best-first";  
+    // search_alg = "depth-first";  
+    // search_alg = "breadth-first";  
+    // search_alg = "greedy-best-first";  
     search_alg = "A-star";  
     //search_alg = "RRT";  
     //search_alg = "RRT-connect";  
-    //search_alg = "RRT-star";  
+    // search_alg = "RRT-star";  
 
     // specify default the world for the planner 
     //  (stored as "range" global variable with name "planning_scene")
-    planning_scene = "empty";
+    // planning_scene = "empty";
     // planning_scene = "misc";
     // planning_scene = "narrow1";
-    //planning_scene = "narrow2";
+    planning_scene = "narrow2";
     // planning_scene = "three_sections";
 
     // specify default eps (epsilon) spatial resolution variable
@@ -224,10 +224,16 @@ function animate() {
         // call iteration for the selected search algorithm
         switch (search_alg) {
             case "depth-first": 
+                search_result = iterateGraphSearchDFS();
+                break;
             case "breadth-first": 
+                search_result = iterateGraphSearchBFS();
+                break;
             case "greedy-best-first": 
+                search_result = iterateGraphSearchGreedy();
+                break;
             case "A-star": 
-                search_result = iterateGraphSearch();
+                search_result = iterateGraphSearchAstar();
                 break;
             case "RRT": 
                 search_result = "failed";
@@ -274,7 +280,7 @@ function animate() {
     requestAnimationFrame( animate );
 }
 
-function iterateGraphSearch() {
+function iterateGraphSearchDFS() {
 
 
     // STENCIL: implement a single iteration of a graph search algorithm
@@ -295,7 +301,6 @@ function iterateGraphSearch() {
         return "failed";
 
     current_node = visit_queue.pop();
-    // current_node = visit_queue.shift();
     current_node.visited = true;
     search_visited ++;
     neighbors = adjacent(current_node);
@@ -305,7 +310,9 @@ function iterateGraphSearch() {
             drawHighlightedPathGraph(current_node);
             return "succeeded";
         }
-        if (testCollision(q) || neighbors[i].visited == true) break;
+        if (testCollision(q) || neighbors[i].visited == true || neighbors[i].queued == true) {
+            continue;
+        }
         draw_2D_configuration(q);
         visit_queue.push(neighbors[i]);
         neighbors[i].queued = true;
@@ -313,6 +320,93 @@ function iterateGraphSearch() {
             neighbors[i].parent = current_node;
             neighbors[i].distance = current_node.distance + eps;
         }
+    }
+    return "iterating";
+}
+
+function iterateGraphSearchBFS() {
+
+    if (!visit_queue) 
+        return "failed";
+
+    current_node = visit_queue.shift();
+    current_node.visited = true;
+    search_visited ++;
+    neighbors = adjacent(current_node);
+    for(var i = 0; i < neighbors.length; i++){
+        q = [neighbors[i].x , neighbors[i].y];
+        if (Math.abs(q[0] - q_goal[0]) < eps/2 && Math.abs(q[1] - q_goal[1]) < eps/2 ){
+            drawHighlightedPathGraph(current_node);
+            return "succeeded";
+        }
+        if (testCollision(q) || neighbors[i].visited == true || neighbors[i].queued == true) {
+            continue;
+        }
+        draw_2D_configuration(q);
+        visit_queue.push(neighbors[i]);
+        neighbors[i].queued = true;
+        if(neighbors[i].distance > current_node.distance + eps){
+            neighbors[i].parent = current_node;
+            neighbors[i].distance = current_node.distance + eps;
+        }
+    }
+    return "iterating";
+}
+
+function iterateGraphSearchAstar() {
+
+    if (!visit_queue) 
+        return "failed";
+
+    current_node = minheap_extract(visit_queue);
+    current_node.visited = true;
+    search_visited ++;
+    neighbors = adjacent(current_node);
+    for(var i = 0; i < neighbors.length; i++){
+        q = [neighbors[i].x , neighbors[i].y];
+        if (Math.abs(q[0] - q_goal[0]) < eps/2 && Math.abs(q[1] - q_goal[1]) < eps/2 ){
+            drawHighlightedPathGraph(current_node);
+            return "succeeded";
+        }
+        if (testCollision(q) || neighbors[i].visited == true || neighbors[i].queued == true) {
+            continue;
+        }
+        draw_2D_configuration(q);
+        if(neighbors[i].distance > current_node.distance + eps){
+            neighbors[i].parent = current_node;
+            neighbors[i].distance = current_node.distance + eps;
+        }
+        minheap_insert(visit_queue, neighbors[i]);
+        neighbors[i].queued = true;
+    }
+    return "iterating";
+}
+
+function iterateGraphSearchGreedy() {
+
+    if (!visit_queue) 
+        return "failed";
+
+    current_node = minheap_extract(visit_queue);
+    current_node.visited = true;
+    search_visited ++;
+    neighbors = adjacent(current_node);
+    for(var i = 0; i < neighbors.length; i++){
+        q = [neighbors[i].x , neighbors[i].y];
+        if (Math.abs(q[0] - q_goal[0]) < eps/2 && Math.abs(q[1] - q_goal[1]) < eps/2 ){
+            drawHighlightedPathGraph(current_node);
+            return "succeeded";
+        }
+        if (testCollision(q) || neighbors[i].visited == true || neighbors[i].queued == true) {
+            continue;
+        }
+        draw_2D_configuration(q);
+        if(neighbors[i].distance > current_node.distance + eps){
+            neighbors[i].parent = current_node;
+            neighbors[i].distance = current_node.distance + eps;
+        }
+        minheap_insert(visit_queue, neighbors[i]);
+        neighbors[i].queued = true;
     }
     return "iterating";
 }
@@ -422,6 +516,7 @@ function drawHighlightedPathGraph(current_node) {
     while (q_path_ref.distance > 0) {
         // KE: find cleaner way to draw edges
         //draw_2D_edge_configurations([q_path_ref.x,q_path_ref.y],[q_path_ref.parent.x,q_path_ref.parent.y]);
+        // console.log("x: "+q_path_ref.x + " y: "+q_path_ref.y + "g: " + q_path_ref.distance + " f: " + fscore(q_path_ref));
         ctx.moveTo(xformWorldViewX(q_path_ref.x),xformWorldViewY(q_path_ref.y));
         ctx.lineTo(xformWorldViewX(q_path_ref.parent.x),xformWorldViewY(q_path_ref.parent.y));
         path_length += Math.sqrt(Math.pow(q_path_ref.x-q_path_ref.parent.x,2)+Math.pow(q_path_ref.y-q_path_ref.parent.y,2));
@@ -606,7 +701,15 @@ function adjacent(current_node){
     return neighbors;
 }
 
+function fscore(node){
+    var gscore = node.distance;
+    var hscore = Math.sqrt((q_goal[0] - node.x)**2 + (q_goal[1] - node.y)**2);
 
+    if(search_alg == "A-star")
+        return gscore + hscore;
+    else if (search_alg == "greedy-best-first")
+        return hscore;
+}
 //////////////////////////////////////////////////
 /////     MIN HEAP IMPLEMENTATION FUNCTIONS
 //////////////////////////////////////////////////
@@ -623,7 +726,7 @@ function minheap_insert(heap, new_element) {
     while(n > 0){
       var parentN = Math.floor((n+1)/2)-1;
       parent = heap[parentN];
-      if(new_element >= parent)
+      if(fscore(new_element) >= fscore(parent))
         break;
       heap[parentN] = new_element;
       heap[n] = parent;
@@ -646,10 +749,10 @@ function minheap_extract(heap) {
           var l = 2*i + 1;
           var r = 2*i + 2;
           var smallest = i;
-          if(l < heap.length && heap[l] < heap[i]){
+          if(l < heap.length && fscore(heap[l]) < fscore(heap[i])){
               smallest = l;
           }
-          if(r < heap.length && heap[r] < heap[smallest]){
+          if(r < heap.length && fscore(heap[r]) < fscore(heap[smallest])){
               smallest = r;
           }
           if(smallest != i){

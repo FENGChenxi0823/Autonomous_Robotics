@@ -1,0 +1,186 @@
+<html> 
+
+    <head>
+        <meta charset="UTF-8">
+        <title>AutoRob Project1: Path_Planning Report</title>
+        <style>
+        .main{
+            background-color: #fff;
+            border-radius: 20px;
+            width: 1000px;
+            height: 800px;
+            margin: auto;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+        }
+
+        img {
+          display: block;
+          margin-left: auto;
+          margin-right: auto;
+        }
+        .row:after {
+          content: "";
+          display: table;
+          clear: both;
+        }
+        .column {
+          float: left;
+          width:50%;
+        }
+
+        table{
+         border: 1px solid black;
+        }
+        </style>
+
+        <div style="background-color: lightblue">
+        <h1 style="text-align:center;">AutoRob Project1: Path_Planning</h1>
+        <p style="text-align:center;">Chenxi FENG</p>
+    <head>
+
+    <body>  
+        
+        <div class ="main">
+            <h3>Introduction </h3>
+            <p>This page is the report of the Path_planning project from Autorob course.  Basically, it will talk about the motivation of using searching algorithms in the robot world. Then, it will show the principle of the four graph searching algorithms, listed as Depth-First Searching, Breadth-First Searching, Astar and Greedy-Best Searching, and the experiemental results in different configurations.
+            </p>
+
+            <h3>Motivation </h3>
+            <p>Imagine our robot sits in a map and it wants to go somewhere else to perform a task. Here, the robot has no clue which route it should take, and it is important for us to plan ahead before actually moving. We assume the map is stationary, thus the robot can follow the route planned ahead to reach the goal. 
+            </p>
+        
+            <h3> Methodology</h3>
+            <p>To search the world map, a common way to represent the world as grid map. With a certain resolution, the continous world map is represented as discrete grids or so called nodes. Each node has its neighbors and they are directly connected by edges. The robot can move to an adjacent node with a single step. For a 2D world, the grid map can be mathematically represented as a a 2D array. It is depend on us to decide which nodes are "neighbors" for a certain node, conventionally the directly connected 4 or 8 nodes.</p>
+            <p>Graph search algorithms explore a graph either for general discovery or explicit search. These algorithms carve paths through the graph, but there is no expectation that those paths are computationally optimal.Pathfinding algorithms build on top of graph search algorithms and explore routes between nodes, starting at one node and traversing through relationships until the destination has been reached. </p>
+
+            <img id="gridmap" src="gridmap.png" style="width:50%;">
+                <h4> Depth-Frist Search</h4>
+                <p>A depth-first search (DFS) is an algorithm for traversing a finite graph. DFS visits the child vertices before visiting the sibling vertices; that is, it traverses the depth of any particular path before exploring its breadth. A stack is generally used when implementing the algorithm.</p>
+                <div class="row">
+                    <div class="column"><img src="DFSempty.png" style="width:100%;"></div>
+                    <div class="column"><img src="DFSmisc.png" style="width:100%;"></div>
+                </div>
+                <div class="row">
+                    <div class="column"><img src="DFSNarrow1.png" style="width:100%;"></div>
+                    <div class="column"><img src="DFSNarrow2.png" style="width:100%;"></div>
+                    <div class="column"><img src="DFS3S.png" style="width:100%;"></div>
+                </div>
+
+                <h4> Breadth-Frist Search</h4>
+                <p>BFS is a traversing algorithm where you should start traversing from a selected node (source or starting node) and traverse the graph layerwise thus exploring the neighbour nodes. You must then move towards the next-level neighbour nodes.</p>
+                <div class="row">
+                    <div class="column"><img src="BFSempty.png" style="width:100%;"></div>
+                    <div class="column"><img src="BFSmisc.png" style="width:100%;"></div>
+                </div>   
+                <div class="row"> 
+                    <div class="column"><img src="BFSNarrow1.png" style="width:100%;"></div>
+                    <div class="column"><img src="BFSNarrow2.png" style="width:100%;"></div>
+                    <div class="column"><img src="BFS3S.png" style="width:100%;"></div>
+                </div>
+
+                <h4> A-star Search</h4>
+                <p>A* is an informed search algorithm, or a best-first search, meaning that it is formulated in terms of weighted graphs: starting from a specific starting node of a graph, it aims to find a path to the given goal node having the smallest cost (least distance travelled, shortest time, etc.). It does this by maintaining a tree of paths originating at the start node and extending those paths one edge at a time until its termination criterion is satisfied.</p>
+                <p>At each iteration of its main loop, A* needs to determine which of its paths to extend. It does so based on the cost of the path and an estimate of the cost required to extend the path all the way to the goal. Specifically, A* selects the path that minimizes</p>
+                <p><img src="http://latex.codecogs.com/gif.latex?f(n)=g(n)+h(n)" border="0"/></p>
+                <p>where n is the next node on the path, g(n) is the cost of the path from the start node to n, and h(n) is a heuristic function that estimates the cost of the cheapest path from n to the goal. A* terminates when the path it chooses to extend is a path from start to goal or if there are no paths eligible to be extended. The heuristic function is problem-specific. If the heuristic function is admissible, meaning that it never overestimates the actual cost to get to the goal, A* is guaranteed to return a least-cost path from start to goal.</p>
+                <div class="row">
+                    <div class="column"><img src="AstarEmpty.png" style="width:100%;"></div>
+                    <div class="column"><img src="Astarmisc.png" style="width:100%;"></div>
+                </div>   
+                <div class="row"> 
+                    <div class="column"><img src="AstarNarrow1.png" style="width:100%;"></div>
+                    <div class="column"><img src="AstarNarrow2.png" style="width:102%;"></div>
+                    <div class="column"><img src="Astar3S.png" style="width:100%;"></div>
+                </div>
+
+                <h4> Greedy Best-First Search</h4>
+                <p> Greedy Best-First search with a heuristic attempts to predict how close the end of a path is to a solution, so that paths which are judged to be closer to a solution are extended first. </p>
+                <p><img src="http://latex.codecogs.com/gif.latex?f(n)=h(n)" border="0"/></p>
+                <p>where n is the next node on the path, h(n) is a heuristic function that estimates the cost of the cheapest path from n to the goal. Greedy best-first search terminates when the path it chooses to extend is a path from start to goal or if there are no paths eligible to be extended.</p>
+                <div class="row">
+                    <div class="column"><img src="GreedyEmpty.png" style="width:100%;"></div>
+                    <div class="column"><img src="Greedymisc.png" style="width:100%;"></div>
+                </div>   
+                <div class="row"> 
+                    <div class="column"><img src="GreedyNarrow1.png" style="width:100%;"></div>
+                    <div class="column"><img src="GreedyNarrow2.png" style="width:100%;"></div>
+                    <div class="column"><img src="Greedy3S.png" style="width:100%;"></div>
+                </div>
+
+            <h3>Results & Conclusion</h3>
+            <p>To summarize the experimental results of each searching algorithms in various configurations, we use a table to display the path found in each map and the rank of time reflected by the number visited nodes</p>
+            <p>From the results, we can see that pattern of visited nodes and the final path fall in the expectation. </p>
+            <p>Depth first search pop the most recent node in the visit queue to explore, thus we can see that it traverses a tree structure by exploring as far as possible down each branch before backtracking.</p>
+            <p>Breadth First search dequeue the least recent node to explore, therefore we can see that it traverses a tree structure by fanning out to explore the nearest neighbors and then their sublevel neighbors.In this way, the final path found by BFS is optimal</p>
+            <p>Astar explores the node with smallest fscore, and the resulting tree expands towards the goal with the direction of heuristics. Therefore, it explores much less node compared to DFS ad BFS. Also, it guarantees the final path is optimal</p>
+            <p>Greedy Best-First Search expands the searching tree directly towards the goal. If blocked by a bugtrap or a wall, it will keep searching the nearest nodes around the block point until it finds a way out. In this method, we can see that the searching speed is extremely fast if there are few obstacles in the way to the goal point.</p>
+                <table id="myTable", width="1000", height = "100">
+                    <tr>
+                        <td>Algorithm Type</td>
+                        <td>Path length in Empty map</td>
+                        <td>Path length in Misc map</td>
+                        <td>Path length in Narrow1 map</td>
+                        <td>Path length in Narrow2 map</td>
+                        <td>Path length in ThreeSection map</td>
+                        <td>Optimal</td>
+                        <td>Rank of Time</td>
+                    </tr>
+                    <tr>
+                        <td>Depth First Search</td>
+                        <td>130.3</td>
+                        <td>98.1</td>
+                        <td>76.1</td>
+                        <td>64.9</td>
+                        <td>97.9</td>
+                        <td>No</td>
+                        <td>3</td>
+                    </tr>
+                    <tr>
+                        <td>Breath First Search</td>
+                        <td>7.9</td>
+                        <td>9.7</td>
+                        <td>7.9</td>
+                        <td>11.3</td>
+                        <td>14.1</td>
+                        <td>Yes</td>
+                        <td>4</td>
+                    </tr>
+                    <tr>
+                        <td>Astar</td>
+                        <td>7.9</td>
+                        <td>9.7</td>
+                        <td>7.9</td>
+                        <td>11.3</td>
+                        <td>14.1</td>
+                        <td>Yes</td>
+                        <td>2</td>
+                    </tr>
+                    <tr>
+                        <td>Greedy Best Frist Search</td>
+                        <td>7.9</td>
+                        <td>17.7</td>
+                        <td>7.9</td>
+                        <td>11.3</td>
+                        <td>14.1</td>
+                        <td>No</td>
+                        <td>1</td>
+                    </tr>
+                    </table>
+
+            <h3>Reference</h3>
+                <p>Chad Jenkins, Lecture nodes:Graph_search, From: https://autorob.org/lectures/autorob_02_graph_search.pdf</p>
+                <p>Prateek Garg. Breath Frist Search. From: https://www.hackerearth.com/practice/algorithms/graphs/breadth-first-search/tutorial/</p>
+                <p>Prateek Garg. Depth Frist Search.From: https://www.hackerearth.com/practice/algorithms/graphs/depth-first-search/tutorial/</p>
+                <p>Amy E. Hodler, Mark Needham, Graph Algorithms,Chapter 4Pathfinding and Graph Search Algorithms, from:https://www.oreilly.com/library/view/graph-algorithms/9781492047674/ch04.html</p>
+                <p>Wikipedia contributors. (2019, September 13). A* search algorithm. In Wikipedia, The Free Encyclopedia. Retrieved 20:29, September 14, 2019, from https://en.wikipedia.org/w/index.php?title=A*_search_algorithm&oldid=915436429</p>
+                <p>Wikipedia contributors. (2019, August 29). Best-first search. In Wikipedia, The Free Encyclopedia. Retrieved 20:29, September 14, 2019, from https://en.wikipedia.org/w/index.php?title=Best-first_search&oldid=913083500</p>
+
+        </div>
+
+
+    </body>
+</html>
