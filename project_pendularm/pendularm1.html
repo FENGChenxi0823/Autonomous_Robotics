@@ -177,8 +177,9 @@ function animate() {
 
     // STENCIL: a correct Euler integrator is REQUIRED for assignment
         pendulum.angle_previous = pendulum.angle;
+        var acc = pendulum_acceleration(pendulum.angle_previous, pendulum.control);
         pendulum.angle = pendulum.angle_previous + dt* pendulum.angle_dot;
-        pendulum.angle_dot = pendulum.angle_dot + dt*pendulum_acceleration(pendulum.angle_previous, pendulum.control);
+        pendulum.angle_dot = pendulum.angle_dot + dt* acc;
         
     }
     else if (numerical_integrator === "verlet") {
