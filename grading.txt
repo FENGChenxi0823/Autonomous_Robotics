@@ -2,12 +2,11 @@
 567 MECH F19
 
 Assignment 1 feature 1 (0.00/0): PathPlan_Honor: DUE
-    comment: good work
+    error: license integrity not maintained (NO GRADE until proper license assertion)
 Assignment 1 feature 2 (4.00/4): PathPlan_Heap: CHECK
     comment: good work
 Assignment 1 feature 3 (8.00/8): PathPlan_AStar: CHECK
     comment: good search implementation
-    error: license integrity not maintained (NO GRADE until proper license assertion)
 Assignment 1 feature 4 (2.00/2): PathPlan_DFS: CHECK
     comment: good work
 Assignment 1 feature 5 (2.00/2): PathPlan_BFS: CHECK
