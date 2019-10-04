@@ -71,7 +71,7 @@ Assignment 7 feature 34 (0.00/6): Pitch_Advanced: PENDING
     
 Assignment 8 feature 35 (0.00/4): Advanced: PENDING
     
-Quiz 1: PENDING
+Quiz 1: 2.83 of 4
 Quiz 2: PENDING
 Quiz 3: PENDING
 Quiz 4: PENDING
