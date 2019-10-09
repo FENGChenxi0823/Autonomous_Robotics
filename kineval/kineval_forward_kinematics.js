@@ -24,7 +24,46 @@ kineval.robotForwardKinematics = function robotForwardKinematics () {
     }
 
     // STENCIL: implement kineval.buildFKTransforms();
+    kineval.buildFKTransforms();
 
+}
+
+kineval.buildFKTransforms = function buildFKTransforms(){
+    traverseFKBase();
+    traverseFKLink(robot.base);
+}
+
+function traverseFKBase(){
+    var translation = generate_translation_matrix(robot.origin.xyz[0],robot.origin.xyz[1],robot.origin.xyz[2]);
+    var rotation = generate_rotation_matrix_euler(robot.origin.rpy[0],robot.origin.rpy[1],robot.origin.rpy[2]);
+    robot.links[robot.base].xform = matrix_multiply(translation, rotation);
+    // console.table(rotation);
+    return;
+}
+
+function traverseFKLink(currLink){
+    if (robot.links[currLink].children == undefined) return;
+    // console.log("currLink "+ currLink +" children joints " + robot.links[currLink].children);
+    var joint;
+    for(joint of robot.links[currLink].children){
+        console.log("currLink"+ currLink +" joint " + joint);
+        var translation = generate_translation_matrix(robot.joints[joint].origin.xyz[0],robot.joints[joint].origin.xyz[1],robot.joints[joint].origin.xyz[2]);
+        var rotation = generate_rotation_matrix_euler(robot.joints[joint].origin.rpy[0],robot.joints[joint].origin.rpy[1],robot.joints[joint].origin.rpy[2]);
+        var transform = matrix_multiply(translation, rotation);
+        robot.joints[joint].xform = matrix_multiply(robot.links[currLink].xform, transform);
+        console.table(robot.joints[joint].xform);
+        traverseFKJoints(joint);
+    }
+    return;
+}
+
+function traverseFKJoints(currJoint){
+    var link = robot.joints[currJoint].child;
+    console.log("currJoint: "+ currJoint +" link " + link);
+    robot.links[link].xform = robot.joints[currJoint].xform;
+    // console.table(robot.lin ks[link].xform);
+    traverseFKLink(link);
+    return;
 }
 
     // STENCIL: reference code alternates recursive traversal over 
