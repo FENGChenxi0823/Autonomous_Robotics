@@ -144,6 +144,7 @@ function generate_rotation_matrix_euler(r,p,y){
     return m;
 }
 
+
     // STENCIL: reference matrix code has the following functions:
     //   matrix_multiply
     //   matrix_transpose
