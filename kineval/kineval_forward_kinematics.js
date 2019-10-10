@@ -46,7 +46,9 @@ function traverseFKBase(){
 }
 
 
-////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//Quaternion implemnetation here
+
 function quaternion_from_axisangle(axis, angle){
     var q;
     var axis_norm = Math.sqrt(axis[0]**2 + axis[1]**2 +axis[2]**2);
@@ -75,7 +77,7 @@ function generate_rotation_matrix_quaternion(q){
     return m;
 }
 
-////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 function traverseFKLink(currLink){
@@ -96,13 +98,8 @@ function traverseFKLink(currLink){
                                     robot.joints[joint].angle * robot.joints[joint].axis[2]];
                 transform = matrix_multiply(transform, generate_translation_matrix(joint_trans[0],joint_trans[1],joint_trans[2]));
             }else if((robot.joints[joint].type === "revolute") || (robot.joints[joint].type === "continous")){
-                var axis = robot.joints[joint].axis;
-                var angle = robot.joints[joint].angle;
-                // console.log("axisf: " + axis);
-                // console.log("angle: " + angle);
-                var q = quaternion_from_axisangle(axis, angle);
-                var normalized_q = quaternion_normalize(q);
-                var joint_rotate = generate_rotation_matrix_quaternion(normalized_q);
+                var q = quaternion_from_axisangle(robot.joints[joint].axis, robot.joints[joint].angle);
+                var joint_rotate = generate_rotation_matrix_quaternion(quaternion_normalize(q));
                 transform = matrix_multiply(transform, joint_rotate);
             }else{
                 transform = matrix_multiply(transform, generate_identity(4));
@@ -111,8 +108,7 @@ function traverseFKLink(currLink){
             //consider the ros coordinate notation
             robot.joints[joint].xform = matrix_multiply(transform, matrix_multiply(generate_rotation_matrix_Y(-Math.PI/2),generate_rotation_matrix_X(-Math.PI/2)));
         }
-        robot.joints[joint].xform = transform;
-        // console.table(robot.joints[joint].xform);
+        robot.joints[joint].xform = matrix_copy(transform);
         traverseFKJoints(joint);
     }
     return;
@@ -120,9 +116,7 @@ function traverseFKLink(currLink){
 
 function traverseFKJoints(currJoint){
     var link = robot.joints[currJoint].child;
-    // console.log("currJoint: "+ currJoint +" link " + link);
-    robot.links[link].xform = robot.joints[currJoint].xform;
-    // console.table(robot.lin ks[link].xform);
+    robot.links[link].xform = matrix_copy(robot.joints[currJoint].xform);
     traverseFKLink(link);
     return;
 }

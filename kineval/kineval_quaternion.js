@@ -8,25 +8,17 @@
     //   quaternion_to_rotation_matrix
     //   quaternion_multiply
 
-// function quaternion_from_axisangle(axis, angle){
-// 	// var axis_norm = Math.sqrt(axis[0]**2 + axis[1]**2 +axis[2]**2);
-// 	// axis = [axis[0]/axis_norm, axis[1]/axis_norm, axis[2]/axis_norm];
-// 	return [Math.cos(angle/2), axis[0]*Math.sin(angle/2), axis[1]*Math.sin(angle/2), axis[2]*Math.sin(angle/2)]
-// }
+function quaternion_from_axisangle(axis, angle){
+	var axis_norm = Math.sqrt(axis[0]**2 + axis[1]**2 +axis[2]**2);
+	axis = [axis[0]/axis_norm, axis[1]/axis_norm, axis[2]/axis_norm];
+	return [Math.cos(angle/2), axis[0]*Math.sin(angle/2), axis[1]*Math.sin(angle/2), axis[2]*Math.sin(angle/2)]
+}
 
 function quaternion_normalize(q){
 	var q_norm = Math.sqrt(q[0]**2 + q[1]**2+ q[2]**2 + q[3]**2);
 	return [q[0]/q_norm, q[1]/q_norm, q[2]/q_norm, q[3]/q_norm ];
 }
-// function quaternion_normalize(q){
-// 	var len = q.length;
-// 	var q_norm = 0;
-// 	for(var i=0; i<len; i++){
-// 		q_norm += q[i]*q[i];
-// 	}
-// 	q_norm = Math.sqrt(q_norm);
-// 	return [q[0]/q_norm, q[1]/q_norm, q[2]/q_norm, q[3]/q_norm ];
-// }
+
 
 function generate_rotation_matrix_quaternion(q){
 	var m = generate_identity(4);
