@@ -89,25 +89,26 @@ function traverseFKLink(currLink){
         var rotation = generate_rotation_matrix_euler(robot.joints[joint].origin.rpy[0],robot.joints[joint].origin.rpy[1],robot.joints[joint].origin.rpy[2]);
         var transform = matrix_multiply(robot.links[currLink].xform, matrix_multiply(translation, rotation));
 
+        // console.log(joint, transform, matrix_multiply(translation, rotation));
         //consider the motor DOF if links_geo_imported from ROS
-        if(robot.links_geom_imported){
-            //add the motior DOF here
-            if (robot.joints[joint].type === "prismatic"){
-                var joint_trans = [robot.joints[joint].angle * robot.joints[joint].axis[0],
-                                    robot.joints[joint].angle * robot.joints[joint].axis[1],
-                                    robot.joints[joint].angle * robot.joints[joint].axis[2]];
-                transform = matrix_multiply(transform, generate_translation_matrix(joint_trans[0],joint_trans[1],joint_trans[2]));
-            }else if((robot.joints[joint].type === "revolute") || (robot.joints[joint].type === "continous")){
-                var q = quaternion_from_axisangle(robot.joints[joint].axis, robot.joints[joint].angle);
-                var joint_rotate = generate_rotation_matrix_quaternion(quaternion_normalize(q));
-                transform = matrix_multiply(transform, joint_rotate);
-            }else{
-                transform = matrix_multiply(transform, generate_identity(4));
-            }
+        // if(robot.links_geom_imported){
+        //     //add the motior DOF here
+        //     if (robot.joints[joint].type === "prismatic"){
+        //         var joint_trans = [robot.joints[joint].angle * robot.joints[joint].axis[0],
+        //                             robot.joints[joint].angle * robot.joints[joint].axis[1],
+        //                             robot.joints[joint].angle * robot.joints[joint].axis[2]];
+        //         transform = matrix_multiply(transform, generate_translation_matrix(joint_trans[0],joint_trans[1],joint_trans[2]));
+        //     }
+        //     else if((robot.joints[joint].type === "revolute") || (robot.joints[joint].type === "continous")){
+        //         var q = quaternion_from_axisangle(robot.joints[joint].axis, robot.joints[joint].angle);
+        //         var joint_rotate = generate_rotation_matrix_quaternion(quaternion_normalize(q));
+        //         transform = matrix_multiply(transform, joint_rotate);
+        //     }
+        //     else{
+        //         transform = matrix_multiply(transform, generate_identity(4));
+        //     }
+        // }
 
-            //consider the ros coordinate notation
-            robot.joints[joint].xform = matrix_multiply(transform, matrix_multiply(generate_rotation_matrix_Y(-Math.PI/2),generate_rotation_matrix_X(-Math.PI/2)));
-        }
         robot.joints[joint].xform = matrix_copy(transform);
         traverseFKJoints(joint);
     }

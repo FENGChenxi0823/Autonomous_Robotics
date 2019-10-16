@@ -180,7 +180,7 @@ robot.joints.torso_t0 = {
     type : "fixed",
     parent: "pedestal", child: "torso", 
     axis : [0,0,1],
-    origin : {xyz: [0,0,0.86488], rpy:[0,0,0]},
+    origin : {xyz: [0,0,0], rpy:[0,0,0]},
     limit : {lower:-3.01, upper:3.01}
 };
 
