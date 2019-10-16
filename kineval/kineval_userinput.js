@@ -85,6 +85,11 @@ kineval.handleUserInput = function user_input() {
         }
     }
 
+    // execute forward kinematics
+    // if ( keyboard.pressed("f") )
+    //     kineval.params.just_starting = false;  
+
+
     // execute inverse kinematics
     if ( keyboard.pressed("p") )
         kineval.params.update_ik = true;
