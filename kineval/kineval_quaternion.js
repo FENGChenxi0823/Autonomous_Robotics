@@ -9,9 +9,7 @@
     //   quaternion_multiply
 
 function quaternion_from_axisangle(axis, angle){
-	var axis_norm = Math.sqrt(axis[0]**2 + axis[1]**2 +axis[2]**2);
-	axis = [axis[0]/axis_norm, axis[1]/axis_norm, axis[2]/axis_norm];
-	return [Math.cos(angle/2), axis[0]*Math.sin(angle/2), axis[1]*Math.sin(angle/2), axis[2]*Math.sin(angle/2)]
+    return [Math.cos(angle/2), axis[0]*Math.sin(angle/2), axis[1]*Math.sin(angle/2), axis[2]*Math.sin(angle/2)];
 }
 
 function quaternion_normalize(q){
