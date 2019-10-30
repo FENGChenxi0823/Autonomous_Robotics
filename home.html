@@ -103,9 +103,9 @@
 var url_params = {
     // load robot data object from given source file name
     // robot:"robots/robot_mr2.js",
-    robot:"robots/robot_urdf_example.js",
+    // robot:"robots/robot_urdf_example.js",
     // robot:"robots/robot_crawler.js",
-    // robot:"robots/baxter/baxter.urdf.js",
+    robot:"robots/baxter/baxter.urdf.js",
     // robot:"robots/fetch/fetch.urdf.js",
     // robot:"robots/sawyer/sawyer.urdf.js",
     // robot:"robots/ur10_chenxif/ur10.urdf.js",
@@ -117,9 +117,9 @@ var url_params = {
 
 // preload default robot and world 
 // kineval.loadJSFile("robots/robot_mr2.js","robot");
-kineval.loadJSFile("robots/robot_urdf_example.js","robot");
+// kineval.loadJSFile("robots/robot_urdf_example.js","robot");
 // kineval.loadJSFile("robots/robot_crawler.js","robot");
-// kineval.loadJSFile("robots/baxter/baxter.urdf.js","robot");
+kineval.loadJSFile("robots/baxter/baxter.urdf.js","robot");
 // kineval.loadJSFile("robots/fetch/fetch.urdf.js","robot");
 // kineval.loadJSFile("robots/sawyer/sawyer.urdf.js","robot");
 // kineval.loadJSFile("robots/ur10_chenxif/ur10.urdf.js","robot");
@@ -163,7 +163,7 @@ function my_animate() {
 
     // set to starting point mode is true as default (initialized in kineval.js)
     //   set to false once starting forward kinematics project
-    kineval.params.just_starting = false;  
+    // kineval.params.just_starting = false;  
     
     if (kineval.params.just_starting == true) {
         startingPlaceholderAnimate();

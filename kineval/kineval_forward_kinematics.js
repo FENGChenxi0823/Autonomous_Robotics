@@ -53,39 +53,6 @@ function traverseFKBase(){
 }
 
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//Quaternion implemnetation here
-
-function quaternion_from_axisangle(axis, angle){
-    var q;
-    var axis_norm = Math.sqrt(axis[0]**2 + axis[1]**2 +axis[2]**2);
-    axis = [axis[0]/axis_norm, axis[1]/axis_norm, axis[2]/axis_norm];
-    q = [Math.cos(angle/2), axis[0]*Math.sin(angle/2), axis[1]*Math.sin(angle/2), axis[2]*Math.sin(angle/2)];
-    return q;
-}
-
-function quaternion_normalize(q){
-    var q_norm = Math.sqrt(q[0]**2 + q[1]**2+ q[2]**2 + q[3]**2);
-    return [q[0]/q_norm, q[1]/q_norm, q[2]/q_norm, q[3]/q_norm ];
-}
-
-
-function generate_rotation_matrix_quaternion(q){
-    var m = generate_identity(4);
-    m[0][0] = q[0]*q[0] + q[1]*q[1] - q[2]*q[2] - q[3]*q[3];
-    m[0][1] = 2*( q[1]*q[2] - q[0]*q[3] );
-    m[0][2] = 2*( q[0]*q[2] + q[1]*q[3] );
-    m[1][0] = 2*( q[1]*q[2] + q[0]*q[3] );
-    m[1][1] = q[0]*q[0] - q[1]*q[1] + q[2]*q[2] - q[3]*q[3];
-    m[1][2] = 2*( q[3]*q[2] - q[0]*q[1] );
-    m[2][0] = 2*( q[1]*q[3] - q[0]*q[2] );
-    m[2][1] = 2*( q[1]*q[0] + q[2]*q[3] );
-    m[2][2] = q[0]*q[0] - q[1]*q[1] - q[2]*q[2] + q[3]*q[3];
-    return m;
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 function traverseFKLink(currLink){
     if (robot.links[currLink].children == undefined) return;
@@ -96,24 +63,21 @@ function traverseFKLink(currLink){
         var rotation = generate_rotation_matrix_euler(robot.joints[joint].origin.rpy[0],robot.joints[joint].origin.rpy[1],robot.joints[joint].origin.rpy[2]);
         var transform = matrix_multiply(robot.links[currLink].xform, matrix_multiply(translation, rotation));
 
-        // console.log(joint, transform, matrix_multiply(translation, rotation));
         //consider the motor DOF if links_geo_imported from ROS
-        if(robot.links_geom_imported){
-            //add the motior DOF here
-            if (robot.joints[joint].type === "prismatic"){
-                var joint_trans = [robot.joints[joint].angle * robot.joints[joint].axis[0],
-                                    robot.joints[joint].angle * robot.joints[joint].axis[1],
-                                    robot.joints[joint].angle * robot.joints[joint].axis[2]];
-                transform = matrix_multiply(transform, generate_translation_matrix(joint_trans[0],joint_trans[1],joint_trans[2]));
-            }
-            else if((robot.joints[joint].type === "revolute") || (robot.joints[joint].type === "continous")){
-                var q = quaternion_from_axisangle(robot.joints[joint].axis, robot.joints[joint].angle);
-                var joint_rotate = generate_rotation_matrix_quaternion(quaternion_normalize(q));
-                transform = matrix_multiply(transform, joint_rotate);
-            }
-            else{
-                transform = matrix_multiply(transform, generate_identity(4));
-            }
+
+        if (robot.joints[joint].type == "prismatic"){
+            var joint_trans = [robot.joints[joint].angle * robot.joints[joint].axis[0],
+                                robot.joints[joint].angle * robot.joints[joint].axis[1],
+                                robot.joints[joint].angle * robot.joints[joint].axis[2]];
+            transform = matrix_multiply(transform, generate_translation_matrix(joint_trans[0],joint_trans[1],joint_trans[2]));
+        }
+        else if((robot.joints[joint].type == "revolute") || (robot.joints[joint].type == "continous") || (robot.joints[joint].type == undefined)){
+            var q = quaternion_from_axisangle(robot.joints[joint].axis, robot.joints[joint].angle);
+            var joint_rotate = generate_rotation_matrix_quaternion(quaternion_normalize(q));
+            transform = matrix_multiply(transform, joint_rotate);
+        }
+        else{
+            transform = matrix_multiply(transform, generate_identity(4));
         }
 
         robot.joints[joint].xform = matrix_copy(transform);
