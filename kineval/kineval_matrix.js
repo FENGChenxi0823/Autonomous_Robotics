@@ -145,6 +145,39 @@ function generate_rotation_matrix_euler(r,p,y){
 }
 
 
+function matrix_multiply_vector(m,v){
+    if(m[0].length != v.length) console.warn("matrix vector dimension doesn't match");
+    var res = [];
+    var i,j;
+    for(i =0; i<m.length;i++){
+        var sum =0;
+        for (j =0; j<v.length;j++){
+            sum += m[i][j]*v[j];
+        }
+        res[i] = sum;
+    }
+    return res;
+}
+
+
+function vector_minus(v1,v2){
+    if(v1.length != v2.length) console.warn("vector dimension doesnt match");
+    var v = [];
+    var i;
+    for(i=0; i<v1.length; i++){
+        v[i] =  v1[i] - v2[i];
+    }
+    return v;
+}
+
+
+function rot2rpy(m){
+    var r = Math.atan2(m[2][1],m[2][2]);
+    var p = -Math.asin(m[2][0]);
+    var y = Math.atan2(m[1][0],m[0][0]);
+    return [r,p,y];
+
+}
     // STENCIL: reference matrix code has the following functions:
     //   matrix_multiply
     //   matrix_transpose
