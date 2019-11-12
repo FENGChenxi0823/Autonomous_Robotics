@@ -4,7 +4,6 @@
 
 function matrix_copy(m1) {
     // returns 2D array that is a copy of m1
-
     var mat = [];
     var i,j;
 
@@ -37,12 +36,11 @@ function matrix_multiply(m1,m2){
 
 function matrix_transpose(m1){
     var mat = [];
-    var i, j;
 
-    for(i=0; i<m1[0].length; i++){
+    for(var i=0; i<m1[0].length; i++){
         mat[i] =[];
-        for(j=0; i<m1.length;j++){
-            mat[i][j] =m1[j][i];
+        for( var j=0; j<m1.length; j++){
+            mat[i][j] = m1[j][i];
         }
     }
 
@@ -53,20 +51,29 @@ function matrix_pseudoinverse(m1){
     var N = m1.length;
     var M = m1[0].length;
     if(N>M){
-        var m = numeric.inv(matrix_multiply(matrix_tanspose(m1), m1));
-        return matrix_multiply(m, matrix_tanspose(m1)); 
+        var m = numeric.inv(matrix_multiply(matrix_transpose(m1), m1));
+        return matrix_multiply(m, matrix_transpose(m1)); 
     }
     else if(N<M){
-        var m = numeric.inv(matrix_multiply(m1, matrix_tanspose(m1)));
-        return matrix_multiply(matrix_tanspose(m1), m);
+        var m = numeric.inv(matrix_multiply(m1, matrix_transpose(m1)));
+        return matrix_multiply(matrix_transpose(m1), m);
     }else{
         return numeric.inv(m1);
     }
 }
 
-// function matrix_invert_affine(){
+function matrix_invert_affine(m1){
+    if (m1.length !=4) console.warn("input not affine matrix");
+    var mat=[];
+    for(var i=0; i<3; i++){
+        mat[i] =[];
+        for(var j =0; j<3; j++){
+            mat[i][j] =m1[i][j];
+        }
+    }
 
-// }
+    return mat;
+}
 
 
 function vector_normalize(v1){
@@ -172,11 +179,23 @@ function vector_minus(v1,v2){
 
 
 function rot2rpy(m){
-    var r = Math.atan2(m[2][1],m[2][2]);
-    var p = -Math.asin(m[2][0]);
-    var y = Math.atan2(m[1][0],m[0][0]);
-    return [r,p,y];
+    var r,p,y;
+    if(m[2][0] != 1 || m[2][0] !=-1){
+        p = -Math.asin(m[2][0]);
+        r = Math.atan2(m[2][1]/Math.cos(p),m[2][2]/Math.cos(p));
+        y = Math.atan2(m[1][0]/Math.cos(p),m[0][0]/Math.cos(p));
+    }else{
+        y =0;
+        if(m[2][0]==-1){
+            p = Math.pi /2;
+            r = y+Math.atan2(m[0][1],m[0][2]);
+        }else{
+            p = -Math.pi/2;
+            r = -y + Math.atan2(-m[0][1],-m[0][2]);
+        }
+    }
 
+    return [r,p,y];
 }
     // STENCIL: reference matrix code has the following functions:
     //   matrix_multiply

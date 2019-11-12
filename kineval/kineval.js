@@ -71,7 +71,7 @@ kineval.init = function init() {
 
     // initialize rosbridge connection to robot running ROS, if available
     // KE 2 : uncomment and add toggle 
-    //kineval.initrosbridge();
+    // kineval.initrosbridge();
 
     // call user's initialization
     my_init();
@@ -278,8 +278,8 @@ kineval.initParameters = function initParameters() {
     kineval.params.update_ik = false;      
     kineval.params.persist_ik = false;      
     kineval.params.trial_ik_random = {};
-    kineval.params.trial_ik_random.execute = false;
-    kineval.params.trial_ik_random.start = 0;
+    kineval.params.trial_ik_random.execute = true;
+    kineval.params.trial_ik_random.start = new Date();
     kineval.params.trial_ik_random.time = 0.00001;
     kineval.params.trial_ik_random.targets = 0;
     kineval.params.trial_ik_random.distance_current = 0.00001;
