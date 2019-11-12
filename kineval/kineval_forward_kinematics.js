@@ -71,7 +71,7 @@ function traverseFKLink(currLink){
                                 robot.joints[joint].angle * robot.joints[joint].axis[2]];
             transform = matrix_multiply(transform, generate_translation_matrix(joint_trans[0],joint_trans[1],joint_trans[2]));
         }
-        else if((robot.joints[joint].type == "revolute") || (robot.joints[joint].type == "continous") || (robot.joints[joint].type == undefined)){
+        else if((robot.joints[joint].type == "revolute") || (robot.joints[joint].type == "continuous") || (robot.joints[joint].type == undefined)){
             var q = quaternion_from_axisangle(robot.joints[joint].axis, robot.joints[joint].angle);
             var joint_rotate = generate_rotation_matrix_quaternion(quaternion_normalize(q));
             transform = matrix_multiply(transform, joint_rotate);
