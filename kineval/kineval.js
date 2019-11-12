@@ -212,10 +212,10 @@ kineval.robotDraw = function drawRobot() {
             matrix_multiply(
                 generate_translation_matrix(kineval.params.ik_target.position[0][0],kineval.params.ik_target.position[1][0],kineval.params.ik_target.position[2][0]),
                 matrix_multiply(
-                    generate_rotation_matrix_X(kineval.params.ik_target.orientation[0]),
+                    generate_rotation_matrix_Z(kineval.params.ik_target.orientation[2]),
                     matrix_multiply(
                         generate_rotation_matrix_Y(kineval.params.ik_target.orientation[1]),
-                        generate_rotation_matrix_Z(kineval.params.ik_target.orientation[2])
+                        generate_rotation_matrix_X(kineval.params.ik_target.orientation[0])
         ))));
     else 
         var target_mat = matrix_2Darray_to_threejs(generate_translation_matrix(kineval.params.ik_target.position[0][0],kineval.params.ik_target.position[1][0],kineval.params.ik_target.position[2][0]));
