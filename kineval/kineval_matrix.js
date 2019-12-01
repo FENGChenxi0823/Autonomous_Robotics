@@ -79,11 +79,20 @@ function matrix_invert_affine(m1){
 function vector_normalize(v1){
     var vec = [];
     var i;
-    var norm = Math.sqrt(v1[0]**2 + v1[1]**2 +v1[2]**2);
+    var norm = vector_norm(v1);
     for(i = 0; i<v1.length; i++){
         vec[i] = v1[i]/norm;
     }
     return vec;
+}
+
+
+function vector_norm(v1){
+    var norm = 0;
+    for(var i=0; i<v1.length; i++){
+        norm = norm + v1[i]**2;
+    }
+    return Math.pow(norm, 0.5);
 }
 
 function vector_cross(v1,v2){

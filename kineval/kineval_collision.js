@@ -55,14 +55,20 @@ kineval.poseIsCollision = function robot_collision_test(q) {
 
     // traverse robot kinematics to test each body for collision
     // STENCIL: implement forward kinematics for collision detection
-    return robot_collision_forward_kinematics();
+    return robot_collision_forward_kinematics(q);
 
 }
 
 
-function robot_collision_forward_kinematics(){
-
-    return traverse_collision_forward_kinematics_link(robot.base);
+function robot_collision_forward_kinematics(q){
+    var translation = generate_translation_matrix(q[0],q[1],q[2]);
+    var rotation = generate_rotation_matrix_euler(q[3],q[4],q[5]);
+    var mstack = matrix_multiply(translation, rotation);
+    if (robot.links_geom_imported) {
+        var ros2js = matrix_multiply(generate_rotation_matrix_Y( -Math.PI / 2 ),generate_rotation_matrix_X( - Math.PI / 2 ));
+        mstack = matrix_multiply(mstack, ros2js);
+    }
+    return traverse_collision_forward_kinematics_link(robot.base, q, mstack);
 }
 
 
@@ -70,17 +76,18 @@ function robot_collision_forward_kinematics(){
 
 
 
-function traverse_collision_forward_kinematics_link(link) {
+function traverse_collision_forward_kinematics_link(link, q, mstack) {
 
     // test collision by transforming obstacles in world to link space
-    var xform_inv = numeric.inv(robot.links[link].xform);
-    // console.log(link, xform_inv);
+    // console.log(link, mstack);
+
+    var mstack_inv = numeric.inv(mstack);
     var j;
 
     // test each obstacle against link bbox geometry by transforming obstacle into link frame and testing against axis aligned bounding box
     for (j in robot_obstacles) { 
 
-        var obstacle_local = matrix_multiply(xform_inv,robot_obstacles[j].location);
+        var obstacle_local = matrix_multiply(mstack_inv,robot_obstacles[j].location);
         // assume link is in collision as default
         var in_collision = true; 
 
@@ -114,8 +121,7 @@ function traverse_collision_forward_kinematics_link(link) {
         var local_collision;
         var i;
         for (i of robot.links[link].children) {
-            local_collision = traverse_collision_forward_kinematics_joint(i);
-            // local_collision = false;
+            local_collision = traverse_collision_forward_kinematics_joint(robot.joints[i], q, mstack);
             if (local_collision)
                 return local_collision;
         }
@@ -125,21 +131,46 @@ function traverse_collision_forward_kinematics_link(link) {
     return false;
 }
 
+function traverse_collision_forward_kinematics_joint(joint, q, mstack){
 
+    var angle = q[q_names[joint.name]];
+    var translation = generate_translation_matrix(joint.origin.xyz[0],joint.origin.xyz[1],joint.origin.xyz[2]);
+    var rotation = generate_rotation_matrix_euler(joint.origin.rpy[0],joint.origin.rpy[1],joint.origin.rpy[2]);
+    var transform = matrix_multiply(mstack, matrix_multiply(translation, rotation));
+    // console.log(joint.name, transform);
+    //consider the motor DOF if links_geo_imported from ROS
 
-function traverse_collision_forward_kinematics_joint(joint) { 
-
-    // recurse child joints for collisions, returning true if child returns collision
-    if (typeof robot.joints[joint].child !== 'undefined') { // return if there are no children
-        var local_collision;
-            local_collision = traverse_collision_forward_kinematics_link(robot.joints[joint].child);
-            if (local_collision)
-                return local_collision;
+    if (joint.type == "prismatic"){
+        var joint_trans = [angle * joint.axis[0],angle * joint.axis[1], angle * joint.axis[2]];
+        transform = matrix_multiply(transform, generate_translation_matrix(joint_trans[0],joint_trans[1],joint_trans[2]));
+    }
+    else if((joint.type == "revolute") || (joint.type == "continuous") || (joint.type == undefined)){
+        var quaternion = quaternion_from_axisangle(joint.axis, angle);
+        var joint_rotate = generate_rotation_matrix_quaternion(quaternion_normalize(quaternion));
+        transform = matrix_multiply(transform, joint_rotate);
+    }
+    else{
+        transform = matrix_multiply(transform, generate_identity(4));
     }
 
-    // return false, when no collision detected for this link and children 
-    return false;
+
+    return traverse_collision_forward_kinematics_link(joint.child, q, transform);
 }
+
+
+// function traverse_collision_forward_kinematics_joint(joint) { 
+
+//     // recurse child joints for collisions, returning true if child returns collision
+//     if (typeof robot.joints[joint].child !== 'undefined') { // return if there are no children
+//         var local_collision;
+//             local_collision = traverse_collision_forward_kinematics_link(robot.joints[joint].child);
+//             if (local_collision)
+//                 return local_collision;
+//     }
+
+//     // return false, when no collision detected for this link and children 
+//     return false;
+// }
 
 // function collision_FK_link(link,mstack,q) {
 
