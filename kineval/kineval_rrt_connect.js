@@ -360,6 +360,7 @@ function rrtstar_extend(tree, q_rand){
     var goal_idx = 0;
     var q_near = nearest_neighbor(tree, q_rand);
     var q_new = new_config(q_near[0], q_rand);
+    console.log(q_near[0],q_rand, q_new);
     if(!kineval.poseIsCollision(q_new)){
         tree_add_vertex(tree, q_new);
         var x_near = nearVertices(tree,q_new);
@@ -378,7 +379,7 @@ function rrtstar_extend(tree, q_rand){
 
 function nearVertices(tree, q_new){
     var x_near = [];
-    var r = 0.4;
+    var r = 0.3;
     for(var i =0; i <tree.vertices.length-1; i++){
         var d = vector_norm(vector_minus(tree.vertices[i].vertex, q_new));
         if(d < r){
@@ -413,7 +414,7 @@ function rewire(tree, x_near,q_min, q_new){
         if (x_near[i][1] != q_min[1] && x_near[i][0].cost > new_cost){
             //change parent
             x_near[i][0].edges.shift();
-            x_near[i][0].edges.unshift(tree.newest);
+            x_near[i][0].edges.unshift(tree.vertices[tree.newest]);
             x_near[i][0].cost = new_cost;
         }
     }
@@ -430,7 +431,7 @@ function isGoal(q_new, q_goal){
     // }
     // return reached;
     // console.log (q_new, q_goal,vector_norm(vector_minus(q_new,q_goal)));
-    return (vector_norm(vector_minus(q_new,q_goal)) < step);
+    return (vector_norm(vector_minus(q_new,q_goal)) < step/2);
 
 
 }
@@ -454,6 +455,7 @@ function nearest_neighbor(tree, q_rand){
 
 function new_config(q1, q2){
     // console.log(q1,q2);
+    if (isSame(q1,q2)) return q1;
     var direction = vector_normalize(vector_minus(q2,q1));
     // console.log(direction);
     var q_new = [];
@@ -502,12 +504,15 @@ function find_path(){
 function path_trace(tree){
     var path = [];
     var v = tree.vertices[tree.newest];
+
+    // console.log(tree.newest, tree.vertices[tree.newest]);
     while(!isSame(v.vertex, tree.vertices[0].vertex)){
         path.unshift(v);
         v.geom.material.color = {r:1,g:0,b:0};
         v = v.edges[0];
         // console.log(v.vertex);
     }
+    path.unshift(tree.vertices[0]);
     return path;
 }
 
@@ -549,7 +554,7 @@ function path_dfs(tree,goal_idx){
     // }
     
     var dummy_v = tree.vertices[goal_idx];
-    console.log(goal_idx, dummy_v.vertex, tree.vertices[0].vertex);
+
 
     while(!isSame(dummy_v.vertex, tree.vertices[0].vertex)){
         path.unshift(dummy_v);
@@ -557,6 +562,7 @@ function path_dfs(tree,goal_idx){
         dummy_v = dummy_v.edges[0];
         // console.log(v.vertex);
     }
+    path.unshift(tree.vertices[0]);
     return path;
 }
 
