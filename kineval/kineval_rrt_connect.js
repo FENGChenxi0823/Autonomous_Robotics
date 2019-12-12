@@ -140,7 +140,7 @@ kineval.robotRRTPlannerInit = function robot_rrt_planner_init() {
 function robot_rrt_planner_iterate() {
 
     var i;
-    rrt_alg = 2;  // 0: basic rrt (OPTIONAL), 1: rrt_connect (REQUIRED)
+    rrt_alg = 1;  // 0: basic rrt (OPTIONAL), 1: rrt_connect (REQUIRED)
 
     if (rrt_iterate && (Date.now()-cur_time > 10)) {
         cur_time = Date.now();
@@ -360,7 +360,7 @@ function rrtstar_extend(tree, q_rand){
     var goal_idx = 0;
     var q_near = nearest_neighbor(tree, q_rand);
     var q_new = new_config(q_near[0], q_rand);
-    console.log(q_near[0],q_rand, q_new);
+    // console.log(q_near[0],q_rand, q_new);
     if(!kineval.poseIsCollision(q_new)){
         tree_add_vertex(tree, q_new);
         var x_near = nearVertices(tree,q_new);

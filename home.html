@@ -110,7 +110,11 @@ var url_params = {
     // robot:"robots/sawyer/sawyer.urdf.js",
     // robot:"robots/ur10_chenxif/ur10.urdf.js",
     // load world data object from given source file name
-    world:"worlds/world_local_minima.js",
+    world:"worlds/world_barrier.js",
+    // world:"worlds/world_basic.js",
+    // world:"worlds/world_empty.js",
+    // world:"worlds/world_local_minima.js",
+    // world:"worlds/world_random.js",
     // specify floor/map image from given image file name
     map_filename: "maps/Cam_Prep-VFX-checkerboard-lens_distortion-1in.jpg"
 };
@@ -123,7 +127,12 @@ kineval.loadJSFile("robots/robot_mr2.js","robot");
 // kineval.loadJSFile("robots/fetch/fetch.urdf.js","robot");
 // kineval.loadJSFile("robots/sawyer/sawyer.urdf.js","robot");
 // kineval.loadJSFile("robots/ur10_chenxif/ur10.urdf.js","robot");
-kineval.loadJSFile("worlds/world_local_minima.js","world");
+kineval.loadJSFile("worlds/world_barrier.js","world");
+// kineval.loadJSFile("worlds/world_basic.js","world");
+// kineval.loadJSFile("worlds/world_empty.js","world");
+// kineval.loadJSFile("worlds/world_local_minima.js","world");
+// kineval.loadJSFile("worlds/world_random.js","world");
+
 //kineval.loadJSFile("worlds/world_empty.js","world");
 
 // parse KinEval parameters from document URL and set defaults

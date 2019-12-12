@@ -1,0 +1,10 @@
+Advanced extensions
+
+1. Assignment 1: Graph search
+Of the 4 possible advanced extension points, one additional point for this assignment can be earned by implementing a navigation algorithm using a probabilistic roadmap ("PRM"). This roadmap algorithm implementation must be contained within the file "search_canvas.html" under the "project_pathplan" directory.
+
+2. Assignment 5: Inverse Kinematics
+Of the 4 possible advanced extension points, one additional point for this assignment can be earned by reaching to 100 targets in a random trial within 60 seconds. A video of this execution must be provided to demonstrate this achievement. This video file should be in the repository root directory with the name "IK100in60" and appropriate file extension.
+
+3. Assignment 6: motion planning
+Of the 4 possible advanced extension points, one additional point for this assignment can be earned by adding the capability of motion planning to an arbitrary robot configuration goal.

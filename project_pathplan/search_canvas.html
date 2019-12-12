@@ -76,17 +76,18 @@ function initSearch() {
     // search_alg = "depth-first";  
     // search_alg = "breadth-first";  
     // search_alg = "greedy-best-first";  
-    search_alg = "A-star";  
+    // search_alg = "A-star";  
     //search_alg = "RRT";  
     //search_alg = "RRT-connect";  
     // search_alg = "RRT-star";  
+    search_alg = "PRM";
 
     // specify default the world for the planner 
     //  (stored as "range" global variable with name "planning_scene")
     // planning_scene = "empty";
-    // planning_scene = "misc";
+    planning_scene = "misc";
     // planning_scene = "narrow1";
-    planning_scene = "narrow2";
+    // planning_scene = "narrow2";
     // planning_scene = "three_sections";
 
     // specify default eps (epsilon) spatial resolution variable
@@ -146,6 +147,10 @@ function initSearch() {
 
     // initialize graph search algorithms (DFS, BFS, A-star) 
     initSearchGraph();
+
+    //initialize prm grah search
+    if (search_alg == "PRM")
+        T = initPRM();
 
     // flag to continue or stop search iterations
     search_iterate = true;
@@ -243,10 +248,13 @@ function animate() {
                 break;
             case "RRT-connect": 
                 // (hack to speed viz) while (search_result == "failed") 
-                    search_result = iterateRRTConnect();
+                search_result = iterateRRTConnect();
                 break;
             case "RRT-star": 
                 search_result = iterateRRTStar();
+                break;
+            case "PRM": 
+                search_result = iteratePRMSearch();
                 break;
             default: 
                 console.warn('search_canvas: search algorithm not found, using rrt as default');
@@ -532,6 +540,7 @@ function initSearchGraph() {
     // KE: visit queue not created for certain values of eps
     visit_queue = [];
     current_node = null;
+    goal_node = null;
     // initialize search graph as 2D array over configuration space 
     //   of 2D locations with specified spatial resolution 
     G = [];
@@ -545,7 +554,8 @@ function initSearchGraph() {
                 distance:10000, // distance to start via path through parent
                 visited:false, // flag for whether the node has been visited
                 priority:null, // visit priority based on fscore
-                queued:false // flag for whether the node has been queued for visiting
+                queued:false, // flag for whether the node has been queued for visiting
+                edges:[]
             };
 
             // STENCIL: determine whether this graph node should be the start
@@ -555,9 +565,104 @@ function initSearchGraph() {
                 G[iind][jind].visited = true;
                 visit_queue = [G[iind][jind]];
                 current_node = G[iind][jind];
+            }   
+
+            if (Math.abs(G[iind][jind].x - q_goal[0]) < eps/2.0 && Math.abs(G[iind][jind].y - q_goal[1]) < eps/2.0){
+                goal_node = G[iind][jind];
             }               
         }
     }
+}
+
+
+function initPRM(){
+    console.log("init PRM");
+    var map = {};
+    map.vertices = [];
+    map.vertices[0] = current_node;
+    map.vertices[1] = goal_node;
+
+    var n = 400;
+    //generate n sample points in 2D grid map
+    for(var k = 2; k< n ;){
+        var i = Math.floor(Math.random()*(6/eps)+10);
+        var j = Math.floor(Math.random()*(6/eps)+10);
+        var q = [G[i][j].x, G[i][j].y]
+        if(!testCollision(q)){
+            map.vertices[k]= G[i][j];
+            draw_2D_configuration(q);
+            k++;
+        }
+    }
+    //connect with eucildean distance
+    prm_radius = 1;
+    for(var i = 0; i< map.vertices.length; i++){
+        for(var j = i+1; j < map.vertices.length; j++ ){
+            var q1 = [map.vertices[i].x,map.vertices[i].y];
+            var q2 = [map.vertices[j].x,map.vertices[j].y];
+            if (euclideanDistance(q1,q2) < prm_radius && !edgeCollision(q1,q2)){
+                map.vertices[i].edges.push(map.vertices[j]);
+                map.vertices[j].edges.push(map.vertices[i]);
+            }
+        }
+    }
+
+}
+
+function iteratePRMSearch(){
+    if (!visit_queue) 
+        return "failed";
+
+    current_node = visit_queue.shift();
+    current_node.visited = true;
+    search_visited ++;
+    neighbors = current_node.edges;
+    // console.log(current_node, current_node.edges);
+    if (Math.abs(current_node.x - q_goal[0]) < eps/2 && Math.abs(current_node.y - q_goal[1]) < eps/2 ){
+            drawHighlightedPathGraph(current_node);
+            return "succeeded";
+    }
+    for(var i = 0; i < neighbors.length; i++){
+        q = [neighbors[i].x,neighbors[i].y];
+        if (testCollision(q) || neighbors[i].visited == true) {
+            continue;
+        }
+        draw_2D_configuration(q);
+        visit_queue.push(neighbors[i]);
+        neighbors[i].visited = true;
+        if(neighbors[i].distance > current_node.distance + euclideanDistance(q,[current_node.x,current_node.y])){
+            neighbors[i].parent = current_node;
+            neighbors[i].distance = current_node.distance + euclideanDistance(q,[current_node.x, current_node.y]);
+        }
+    }
+    return "iterating";
+}
+
+
+function edgeCollision(q1,q2){
+    var collid = false;
+    var steer = [(q1[0]-q2[0])*0.1,(q1[1]-q2[1])*0.1];
+    var temp = q2;
+    var counter = 0;
+    while(counter < 10){
+        temp[0] = temp[0]+ steer[0];
+        temp[1] = temp[1]+ steer[1];
+        if(testCollision(temp)){
+            collid =true;
+            break;
+        }
+        counter++;
+    }
+    return collid;
+}
+
+function euclideanDistance(q1,q2){
+    if(q1.length != q2.length) console.warn("euclidean distance: vector dimension doesnt match");
+    var distance = 0;
+    for(var i=0; i< q1.length; i++){
+        distance += (q1[i] - q2[i])**2;
+    }
+    return Math.sqrt(distance);
 }
 
 function setPlanningScene() {
