@@ -1,8 +1,9 @@
 15: Feng, Chenxi
 567 MECH F19
 
-Assignment 1 feature 1 (0.00/0): PathPlan_Honor: DUE
+Assignment 1 feature 1 (0.00/0): PathPlan_Honor: CHECK
     error: license integrity not maintained (NO GRADE until proper license assertion)
+    regrade: honor code sufficiently asserted via licence file
 Assignment 1 feature 2 (4.00/4): PathPlan_Heap: CHECK
     comment: good work
 Assignment 1 feature 3 (8.00/8): PathPlan_AStar: CHECK
@@ -23,8 +24,8 @@ Assignment 2 feature 10 (1.00/1): Pendularm_Verlet: CHECK
     
 Assignment 2 feature 11 (2.00/2): Pendularm_RK4: CHECK
     
-Assignment 2 feature 12 (0.00/3): Pendularm_Double: PENDING
-    
+Assignment 2 feature 12 (1.98/3): Pendularm_Double: PERCENT 66
+    comment: integration with servo controls
 Assignment 3 feature 13 (2.00/2): FK_MatrixRoutines: CHECK
     
 Assignment 3 feature 14 (8.00/8): FK_Transforms: CHECK
@@ -41,13 +42,15 @@ Assignment 4 feature 19 (2.00/2): FSMDance_BaseControl: CHECK
     
 Assignment 4 feature 20 (2.00/2): FSMDance_SetpointControl: CHECK
     
-Assignment 4 feature 21 (1.00/2): FSMDance_FSM: PERCENT 50
+Assignment 4 feature 21 (2.00/2): FSMDance_FSM: CHECK
     borderline: new dance setpoints were not created
+    note: resolved during asgn6 regrading
+    comment: branch for Baxter setpoints created
 Assignment 4 feature 22 (2.00/2): FSMDance_JointLimits: CHECK
     
 Assignment 4 feature 23 (2.00/2): FSMDance_Prismatic: CHECK
     
-Assignment 4 feature 24 (0.00/2): FSMDance_Rosbridge: PENDING
+Assignment 4 feature 24 (2.00/2): FSMDance_Rosbridge: CHECK
     
 Assignment 5 feature 25 (6.00/6): IK_Jacobian: CHECK
     
@@ -57,22 +60,27 @@ Assignment 5 feature 27 (3.00/3): IK_JPseudoinverse: CHECK
     
 Assignment 5 feature 28 (6.00/6): IK_EulerAngles: CHECK
     
-Assignment 6 feature 29 (0.00/4): MotionPlan_Collision: PENDING
+Assignment 6 feature 29 (4.00/4): MotionPlan_Collision: CHECK
     
-Assignment 6 feature 30 (0.00/2): MotionPlan_2DRRTConnect: PENDING
-    
-Assignment 6 feature 31 (0.00/6): MotionPlan_CSpaceRRTConnect: PENDING
-    
+Assignment 6 feature 30 (0.00/2): MotionPlan_2DRRTConnect: DUE
+    error: motion planner does not iterate
+Assignment 6 feature 31 (0.00/6): MotionPlan_CSpaceRRTConnect: DUE
+    error: planner does not return motion path solution within expected time
+    error: sampling does not sufficiently explore configuration space
 Assignment 6 feature 32 (0.00/6): MotionPlan_RRTStar: PENDING
     
-Assignment 7 feature 33 (0.00/12): Pitch: PENDING
+Assignment 7 feature 33 (12.00/12): Pitch: CHECK
     
-Assignment 7 feature 34 (0.00/6): Pitch_Advanced: PENDING
+Assignment 7 feature 34 (6.00/6): Pitch_Advanced: CHECK
     
 Assignment 8 feature 35 (0.00/4): Advanced: PENDING
-    
+    PathPlan_PRM: PENDING
+    Pendularm_DoublePendulumEOM: error: unjustified assertion
+    comment: justify Equation 16
+    IK_100in60: PENDING
+    RRT_ArbitraryGoal: PENDING
 Quiz 1: 2.83 of 4
 Quiz 2: 4.00 of 4
 Quiz 3: 4.00 of 4
 Quiz 4: 4.00 of 4
-Quiz 5: 4.00 of 4
+Quiz 5: 5.00 of 4
