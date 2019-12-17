@@ -131,7 +131,7 @@ kineval.robotRRTPlannerInit = function robot_rrt_planner_init() {
     // console.log("inittreeA : ", treeA.vertices[0].vertex);
     // console.log("inittreeB : ", treeB.vertices[0].vertex);
     goal_idx = 0;
-    step = 0.2;
+    step = 0.5;
     find_valid_path = false;
 }
 
@@ -298,10 +298,11 @@ function random_config(){
     var lower_bound;
     for(i = 0; i < q_rand_config.length; i++){
         //set the robot_boundary
-        if (i < 3){
-            lower_bound = robot_boundary[0][i];
-            upper_bound = robot_boundary[1][i];
-        }else if(i == 3 || i == 5){
+        if (i==0 || i ==2){
+            lower_bound = robot_boundary[0][i] - 2;
+            upper_bound = robot_boundary[1][i] + 2;
+            // console.log(robot_boundary[0][i], robot_boundary[1][i])
+        }else if(i == 1 || i == 3 || i == 5){
             lower_bound = 0;
             upper_bound = 0;
         }else if(i == 4){
