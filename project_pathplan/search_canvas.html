@@ -62,7 +62,7 @@ My 2D planner
 //////////////////////////////////////////////////
 
 function init() {
-
+    console.log("init");
     // initialize search variables, data structures, DOM elements, etc.
     initSearch();
 
@@ -77,18 +77,18 @@ function initSearch() {
     // search_alg = "breadth-first";  
     // search_alg = "greedy-best-first";  
     // search_alg = "A-star";  
-    //search_alg = "RRT";  
-    //search_alg = "RRT-connect";  
-    // search_alg = "RRT-star";  
-    search_alg = "PRM";
+    // search_alg = "RRT";  
+    // search_alg = "RRT-connect";  
+    search_alg = "RRT-star";  
+    // search_alg = "PRM";
 
     // specify default the world for the planner 
     //  (stored as "range" global variable with name "planning_scene")
     // planning_scene = "empty";
-    planning_scene = "misc";
+    // planning_scene = "misc";
     // planning_scene = "narrow1";
     // planning_scene = "narrow2";
-    // planning_scene = "three_sections";
+    planning_scene = "three_sections";
 
     // specify default eps (epsilon) spatial resolution variable
     //   for RRT, specifies threshold radius for step size and reaching goal
@@ -139,11 +139,12 @@ function initSearch() {
 
     // set the world for the planner 
     setPlanningScene();
-
+    console.log("set setPlanningScene");
     // initialize search tree from start configurations (RRT-based algorithms)
     T_a = initRRT(q_init);
     // also initialize search tree from goal configuration (RRT-Connect)
     T_b = initRRT(q_goal);
+    console.log("init seach graph");
 
     // initialize graph search algorithms (DFS, BFS, A-star) 
     initSearchGraph();
@@ -216,7 +217,7 @@ function animate() {
 
     // render the world to the canvas element
     drawRobotWorld();
-
+    console.log("animate");
     // make sure the rrt iterations are not running faster than animation update
     if (search_iterate && (Date.now()-cur_time > min_msec_between_iterations)) {
 
@@ -242,7 +243,8 @@ function animate() {
                 break;
             case "RRT": 
                 search_result = "failed";
-                // (hack to speed viz) 
+                // (hack to speed viz)
+                // console.log("enter RRT");
                 while (search_result == "failed") 
                     search_result = iterateRRT();
                 break;
@@ -438,6 +440,15 @@ function iterateRRT() {
     //   insertTreeVertex - adds and displays new configuration vertex for a tree
     //   insertTreeEdge - adds and displays new tree edge between configurations
     //   drawHighlightedPath - renders a highlighted path in a tree
+    console.log("iterating");
+    q_rand = random_config();
+    extend = rrt_extend(T_a, q_rand)[0];
+    // console.log(extend, rrt_iter_count);
+    if (extend == "succeeded"){
+        find_path();
+        return extend;
+    } 
+    else return "failed";
 }
 
 function iterateRRTConnect() {
@@ -458,10 +469,32 @@ function iterateRRTConnect() {
     //   insertTreeVertex - adds and displays new configuration vertex for a tree
     //   insertTreeEdge - adds and displays new tree edge between configurations
     //   drawHighlightedPath - renders a highlighted path in a tree
+        q_rand = random_config();
+        var extend = rrt_extend(T_a, q_rand);
+        if(extend[0] != "trapped"){
+            var q_target = extend[1];
+            if (rrt_connect(T_b, q_target) == "succeeded"){
+                find_path();
+                return "succeeded";
+            }
+        }
+        tempTree= T_a;
+        T_a =  T_b;
+        T_b = tempTree;
+        // console.log("treeA : ", treeA.vertices[0].vertex);
+        // console.log("treeB : ", treeB.vertices[0].vertex);
+        return "iterating";
 }
 
 function iterateRRTStar() {
-
+    q_rand = random_config();
+    extend = rrtstar_extend(T_a, q_rand)[0];
+    // console.log(extend);
+    if (extend == "succeeded"){
+        find_path();
+        return extend;
+    } 
+    else return "iterating";
 }
 
 //////////////////////////////////////////////////
@@ -743,6 +776,7 @@ function initRRT(q) {
     tree.vertices[0] = {};
     tree.vertices[0].vertex = q;
     tree.vertices[0].edges = [];
+    tree.vertices[0].cost = 0;
 
     // maintain index of newest vertex added to tree
     tree.newest = 0;
@@ -883,6 +917,286 @@ function minheap_extract(heap) {
     //   newConfig
     //   findNearestNeighbor
     //   dfsPath
+function random_config(){
+    var q_rand_config = new Array(q_start_config.length);
+    
+    var upper_bound;
+    var lower_bound;
+    for(i = 0; i < q_rand_config.length; i++){
+        //set the robot_boundary
+        if (i==0 || i ==1){
+            lower_bound = -2;
+            upper_bound = 6;
+            // console.log(robot_boundary[0][i], robot_boundary[1][i])
+        }else{
+            lower_bound = 0;
+            upper_bound = 0;
+        }
+        q_rand_config[i] = lower_bound + (upper_bound-lower_bound) * Math.random();
+    } 
+    
+    return q_rand_config;
+}
+
+
+function rrt_extend(tree, q_rand){
+    var extend_status = "trapped";
+    var q_near = nearest_neighbor(tree, q_rand);
+    // console.log(q_near[0], q_near[1], q_rand);
+    var q_new = new_config(q_near[0], q_rand);
+    // console.log("q_new : ", q_new);
+    if(!testCollision(q_new)){
+        insertTreeVertex(tree, q_new);
+        insertTreeEdge(tree, q_near[1], tree.newest);
+        if(isGoal(q_new, q_goal_config)) extend_status = "succeeded";
+        else if(isGoal(q_new, q_rand)){
+            extend_status = "connected";
+        }else{
+            extend_status = "advanced";
+        }
+    }
+    return [extend_status, q_new];
+
+}
+
+function rrt_connect(tree, q_target){
+    var connect_status = "advanced";
+    while(connect_status == "advanced"){
+        connect_status = rrt_extend(tree, q_target)[0];
+    }
+    if(connect_status == "connected" || connect_status == "succeeded") 
+    return "succeeded";
+}
+
+
+function rrtstar_extend(tree, q_rand){
+    var extend_status = "trapped";
+    var goal_idx = 0;
+    var q_near = nearest_neighbor(tree, q_rand);
+    var q_new = new_config(q_near[0], q_rand);
+    // console.log(q_near[0],q_rand, q_new);
+    if(!testCollision(q_new)){
+        insertTreeVertex(tree, q_new);
+        var x_near = nearVertices(tree,q_new);
+        var q_min = findParent(tree, x_near, q_new); 
+        insertTreeEdge(tree, q_min[1], tree.newest);
+        rewire(tree, x_near,q_min, q_new);
+        if(isGoal(q_new, q_goal_config)) {
+            extend_status = "succeeded";
+            goal_idx = tree.newest;
+        }
+        else extend_status = "advanced";
+    }
+    return [extend_status, goal_idx];
+
+}
+
+function nearVertices(tree, q_new){
+    var x_near = [];
+    var r = 0.2;
+    for(var i =0; i < tree.vertices.length-1; i++){
+        var d = vector_norm(vector_minus(tree.vertices[i].vertex, q_new));
+        if(d < r){
+            x_near.push([tree.vertices[i], i]);
+        }
+    }
+    console.log("nearVertices: ", x_near.length, x_near[0][0], x_near[0][1]);
+    return x_near;
+}
+
+
+function findParent(tree, x_near, q_new){
+    var min_d = Infinity;
+    var parent_idx = 0;
+    var parent_config;
+    for(var i= 0; i < x_near.length; i++){
+        var d = x_near[i][0].cost + vector_norm(vector_minus(x_near[i][0].vertex, q_new));
+        if (d < min_d) {
+            min_d = d;
+            parent_config = x_near[i][0];
+            parent_idx = x_near[i][1];
+        }
+    }
+    // console.log("findParent: ", parent_config, parent_idx, min_d);
+    tree.vertices[tree.newest].cost = min_d;
+    return [parent_config, parent_idx];
+}
+
+function rewire(tree, x_near,q_min, q_new){
+    for(var i = 0; i<x_near.length; i++){
+        var new_cost = tree.vertices[tree.newest].cost + vector_norm(vector_minus(x_near[i][0].vertex, q_new));
+        if (x_near[i][1] != q_min[1] && x_near[i][0].cost > new_cost){
+            //change parent
+            x_near[i][0].edges.shift();
+            x_near[i][0].edges.unshift(tree.vertices[tree.newest]);
+            x_near[i][0].cost = new_cost;
+        }
+    }
+
+}
+
+function isGoal(q_new, q_goal){
+    // var reached = true;
+    // for(var i =0; i < q_goal.length; i++){
+    //     if(Math.abs(q_new[i] - q_goal[i]) > step/2){
+    //         reached = false;
+    //         break;
+    //     }
+    // }
+    // return reached;
+    // console.log (q_new, q_goal,vector_norm(vector_minus(q_new,q_goal)));
+    return (vector_norm(vector_minus(q_new,q_goal)) < eps/2);
+
+
+}
+
+function nearest_neighbor(tree, q_rand){
+    var min_dis = Infinity;
+    var q_near;
+    var idx;
+    for(var i =0; i <tree.vertices.length; i++){
+
+        var d = vector_norm(vector_minus(tree.vertices[i].vertex, q_rand));
+        if(d < min_dis){
+            min_dis = d;
+            q_near = tree.vertices[i].vertex;
+            idx =i;
+        }
+    }
+    return [q_near, idx];
+}
+
+
+function new_config(q1, q2){
+    // console.log(q1,q2);
+    if (isSame(q1,q2)) return q1;
+    var direction = vector_normalize(vector_minus(q2,q1));
+    // console.log(direction);
+    var q_new = [];
+    for(var i = 0; i< q1.length; i++){
+        q_new[i] = q1[i] + eps* direction[i];
+    }
+    return q_new;
+}
+
+
+function find_path(){
+    console.log("find path");
+    // if (rrt_alg == 1){
+    var pathA = path_trace(T_a);
+    var pathB = path_trace(T_b);
+    // console.log("pathB found"); 
+    //push start path and then the goal path 
+    drawHighlightedPath(pathA);
+    drawHighlightedPath(pathB);
+
+}
+
+function path_trace(tree){
+    var path = [];
+    var v = tree.vertices[tree.newest];
+
+    // console.log(tree.newest, tree.vertices[tree.newest]);
+    while(!isSame(v.vertex, tree.vertices[0].vertex)){
+        path.unshift(v);
+        // v.geom.material.color = {r:1,g:0,b:0};
+        v = v.edges[0];
+        // console.log(v.vertex);
+    }
+    path.unshift(tree.vertices[0]);
+    return path;
+}
+
+
+
+// function find_improved_path(goal_idx){
+//     console.log("rrtstar find improved path");    
+//     var path = path_dfs(treeA, goal_idx);
+//     for(var i =0; i < path.length; i++){
+//         kineval.motion_plan.push(path[i]);
+//     }
+
+// }
+
+function path_dfs(tree,goal_idx){
+    var path = [];
+    // var goal;
+    // var found = false;
+    // var stack = [];
+    // stack.push(tree.vertices[0]);
+    // tree.vertices[0].visited = true;
+
+    // while(stack.length != 0 && !found){
+    //     var curr_v = stack.pop();
+    //     var children = curr_v.edges;
+    //     for(var v of children){
+    //         console.log(children.length, v.vertex);
+    //         if (isSame(v.vertex, q_goal_config)){
+    //             goal = v;
+    //             console.log("find goal: ", goal, goal.vertex);
+    //             found = true;
+    //             break;
+    //         }
+    //         if (v.visited == false) {
+    //             stack.push(v);
+    //             v.visited = true;
+    //         }
+    //     }
+    // }
+    
+    var dummy_v = tree.vertices[goal_idx];
+
+
+    while(!isSame(dummy_v.vertex, tree.vertices[0].vertex)){
+        path.unshift(dummy_v);
+        dummy_v.geom.material.color = {r:0,g:1,b:0};
+        dummy_v = dummy_v.edges[0];
+        // console.log(v.vertex);
+    }
+    path.unshift(tree.vertices[0]);
+    return path;
+}
+
+function isSame(v1,v2){
+    var same = true;
+    for(var i =0; i < v1.length; i++){
+        if(v1[i] != v2[i]){
+            same = false;
+            break;
+        }
+    }
+    return same;
+}
+
+
+function vector_norm(v1){
+    var norm = 0;
+    for(var i=0; i<v1.length; i++){
+        norm = norm + v1[i]**2;
+    }
+    return Math.pow(norm, 0.5);
+}
+
+function vector_minus(v1,v2){
+    if(v1.length != v2.length) console.warn("vector dimension doesnt match");
+    var v = [];
+    var i;
+    for(i=0; i<v1.length; i++){
+        v[i] =  v1[i] - v2[i];
+    }
+    return v;
+}
+
+
+function vector_normalize(v1){
+    var vec = [];
+    var i;
+    var norm = vector_norm(v1);
+    for(i = 0; i<v1.length; i++){
+        vec[i] = v1[i]/norm;
+    }
+    return vec;
+}
 
 </script>
 

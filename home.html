@@ -102,38 +102,38 @@
 // set KinEval user parameter defaults
 var url_params = {
     // load robot data object from given source file name
-    robot:"robots/robot_mr2.js",
+    // robot:"robots/robot_mr2.js",
     // robot:"robots/robot_urdf_example.js",
     // robot:"robots/robot_crawler.js",
     // robot:"robots/baxter/baxter.urdf.js",
-    // robot:"robots/fetch/fetch.urdf.js",
+    robot:"robots/fetch/fetch.urdf.js",
     // robot:"robots/sawyer/sawyer.urdf.js",
     // robot:"robots/ur10_chenxif/ur10.urdf.js",
     // load world data object from given source file name
-    world:"worlds/world_barrier.js",
+    // world:"worlds/world_barrier.js",
     // world:"worlds/world_basic.js",
     // world:"worlds/world_empty.js",
     // world:"worlds/world_local_minima.js",
     // world:"worlds/world_random.js",
-    // world:"worlds/world_s.js",
+    world:"worlds/world_s.js",
     // specify floor/map image from given image file name
     map_filename: "maps/Cam_Prep-VFX-checkerboard-lens_distortion-1in.jpg"
 };
 
 // preload default robot and world 
-kineval.loadJSFile("robots/robot_mr2.js","robot");
+// kineval.loadJSFile("robots/robot_mr2.js","robot");
 // kineval.loadJSFile("robots/robot_urdf_example.js","robot");
 // kineval.loadJSFile("robots/robot_crawler.js","robot");
 // kineval.loadJSFile("robots/baxter/baxter.urdf.js","robot");
-// kineval.loadJSFile("robots/fetch/fetch.urdf.js","robot");
+kineval.loadJSFile("robots/fetch/fetch.urdf.js","robot");
 // kineval.loadJSFile("robots/sawyer/sawyer.urdf.js","robot");
 // kineval.loadJSFile("robots/ur10_chenxif/ur10.urdf.js","robot");
-kineval.loadJSFile("worlds/world_barrier.js","world");
+// kineval.loadJSFile("worlds/world_barrier.js","world");
 // kineval.loadJSFile("worlds/world_basic.js","world");
 // kineval.loadJSFile("worlds/world_empty.js","world");
 // kineval.loadJSFile("worlds/world_local_minima.js","world");
 // kineval.loadJSFile("worlds/world_random.js","world");
-// kineval.loadJSFile("worlds/world_s.js", "world");
+kineval.loadJSFile("worlds/world_s.js", "world");
 // kineval.loadJSFile("worlds/world_empty.js","world");
 
 // parse KinEval parameters from document URL and set defaults
