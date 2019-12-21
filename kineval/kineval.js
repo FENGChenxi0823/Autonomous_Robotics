@@ -335,6 +335,7 @@ kineval.initParameters = function initParameters() {
     // initialize flags for executing planner
     kineval.params.generating_motion_plan = false; // monitor specifying state of motion plan generation
     kineval.params.update_motion_plan = false; // sets request to generate motion plan 
+    kineval.params.random_goal = false; //sets request to generate random goal config
     kineval.motion_plan = [];
     kineval.motion_plan_traversal_index = 0;
     kineval.params.update_motion_plan_traversal = false; // sets automatic traversal of previously generated motion plan

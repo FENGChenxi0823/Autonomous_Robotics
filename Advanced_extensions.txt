@@ -8,3 +8,4 @@ Of the 4 possible advanced extension points, one additional point for this assig
 
 3. Assignment 6: motion planning
 Of the 4 possible advanced extension points, one additional point for this assignment can be earned by adding the capability of motion planning to an arbitrary robot configuration goal.
+usage: Press keyboard "y" to enable random goal config 

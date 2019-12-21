@@ -66,6 +66,9 @@ kineval.handleUserInput = function user_input() {
     if ( keyboard.pressed("m") )
         kineval.params.update_motion_plan = true;
 
+    //request random goal config for rrt as advanced extension
+    if ( keyboard.pressed("y") )
+        kineval.params.random_goal = true;
     // traverse generated motion plan
     if ( keyboard.pressed("n") |  keyboard.pressed("b")) {
 

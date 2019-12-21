@@ -120,7 +120,9 @@ kineval.robotRRTPlannerInit = function robot_rrt_planner_init() {
     for(i = 0; i < q_goal_config.length; i++) q_goal_config[i] = 0;
 
     //random goal
-    q_goal_config = random_goal();
+    if(kineval.params.random_goal == true)
+        q_goal_config = random_goal();
+
     console.log(q_goal_config);
     // flag to continue rrt iterations
     rrt_iterate = true;
