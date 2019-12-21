@@ -119,6 +119,9 @@ kineval.robotRRTPlannerInit = function robot_rrt_planner_init() {
     q_goal_config = new Array(q_start_config.length);
     for(i = 0; i < q_goal_config.length; i++) q_goal_config[i] = 0;
 
+    //random goal
+    q_goal_config = random_goal();
+    console.log(q_goal_config);
     // flag to continue rrt iterations
     rrt_iterate = true;
     rrt_iter_count = 0;
@@ -291,6 +294,41 @@ function tree_add_edge(tree,q1_idx,q2_idx) {
     //   normalize_joint_state
     //   find_path
     //   path_dfs
+
+function random_goal(){
+    var q_rand_config = new Array(q_start_config.length);
+    
+    var upper_bound;
+    var lower_bound;
+    for(i = 0; i < q_rand_config.length; i++){
+        //set the robot_boundary
+        if (i==0 || i ==2){
+            lower_bound = robot_boundary[0][i];
+            upper_bound = robot_boundary[1][i];
+            // console.log(robot_boundary[0][i], robot_boundary[1][i])
+        }else if(i == 1 || i == 3 || i == 5){
+            lower_bound = 0;
+            upper_bound = 0;
+        }else if(i == 4){
+            lower_bound = -Math.PI;
+            upper_bound = Math.PI;
+        }else{
+            if (robot.joints[q_index[i]].type == 'prismatic'|| robot.joints[q_index[i]].type =='revolute'){
+                lower_bound = robot.joints[q_index[i]].limit.lower;
+                upper_bound = robot.joints[q_index[i]].limit.upper;
+            }else if (robot.joints[q_index[i]].type == 'continuous'){
+                lower_bound = -Math.PI;
+                upper_bound = Math.PI;
+            }else {
+                lower_bound = 0;
+                upper_bound = 0;
+            }
+        }
+        q_rand_config[i] = lower_bound + (upper_bound-lower_bound) * Math.random();
+    } 
+    
+    return q_rand_config;
+}
 
 function random_config(){
     var q_rand_config = new Array(q_start_config.length);
