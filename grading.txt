@@ -75,16 +75,21 @@ Assignment 7 feature 33 (12.00/12): Pitch: CHECK
     
 Assignment 7 feature 34 (6.00/6): Pitch_Advanced: CHECK
     
-Assignment 8 feature 35 (2.00/4): Advanced: PERCENT 50
+Assignment 8 feature 35 (4.52/4): Advanced: PERCENT 113
     PathPlan_PRM: CHECK
     warning: sampling does not need to be restricted to quantized grid
-    Pendularm_DoublePendulumEOM: error: unjustified assertion
+    Pendularm_DoublePendulumEOM: PERCENT 66
+    error: unjustified assertion
+    regrade: unsupported steps in derivation
     comment: justify Equation 16
     IK_100in60: CHECK
-    RRT_ArbitraryGoal: PENDING
-    error: usage unclear
+    RRT_ArbitraryGoal: PERCENT 50
+    error: unexpected goals achieved
 Quiz 1: 2.83 of 4
 Quiz 2: 4.00 of 4
 Quiz 3: 4.00 of 4
 Quiz 4: 4.00 of 4
 Quiz 5: 5.00 of 4
+
+Total points: 147.73333333333332
+Final Grade: A
